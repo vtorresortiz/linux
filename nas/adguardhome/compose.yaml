@@ -1,0 +1,33 @@
+services:
+  adguardhome:
+    container_name: adguardhome
+    image: adguard/adguardhome:latest
+    restart: unless-stopped
+    ports:
+      # DNS service
+      - "53:53/tcp"
+      - "53:53/udp"
+      # Web interface for initial setup and management
+      #- "80:80/tcp" 
+      # Optional: additional ports for other services
+      #- "443:443/tcp" # For DNS-over-HTTPS (DoH) or the web interface
+      #- "853:853/tcp" # For DNS-over-TLS (DoT)
+      #- "3000:3000/tcp" # For initial setup if port 80 is in use
+    volumes:
+      - ./:/opt/adguardhome/work
+      - ./:/opt/adguardhome/conf
+    environment:
+      - TZ=America/Santiago
+    # Recommended capabilities for full functionality, including DHCP
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adguardhome.rule=Host(`ad.home.int`)"
+      - "traefik.http.routers.adguardhome.entrypoints=web"
+      - "traefik.http.services.adguardhome.loadbalancer.server.port=80"
+networks:
+    traefik:
+        external: true

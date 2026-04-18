@@ -1,0 +1,14 @@
+
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    restart: unless-stopped
+    volumes:
+      - ./tun:/dev/net/tun
+      - ./lib:/var/lib
+    environment:
+      - TS_AUTHKEY=<auth_key>
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_ROUTES=172.17.10.0/24
+    network_mode: host
+    privileged: true
